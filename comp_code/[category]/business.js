@@ -2,14 +2,18 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function Bus_news(props) {
+export default function Bus_news({category}) {
+
+  const Category = category==undefined ? "general" : category
+  console.log('Category:',Category);
+  
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
       const apiKey = "71394d9ac17f4df486a392bced45d97f";
-      const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${apiKey}`;
+      const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${Category}&apiKey=${apiKey}`;
       try {
         const response = await axios.get(apiUrl);
         setArticles(response.data.articles);
@@ -21,7 +25,7 @@ export default function Bus_news(props) {
       }
     };
     fetchNews();
-  }, [props.category]);
+  }, [Category]);
 
   return (
     <div className="container">
@@ -33,6 +37,7 @@ export default function Bus_news(props) {
             <div className="col-md-4 mb-4" key={e.publishedAt}>
               <div className="card h-100">
                 {e.urlToImage && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={e.urlToImage}
                     className="card-img-top"
@@ -56,7 +61,7 @@ export default function Bus_news(props) {
           ))}
         </div>
       ) : (
-        <p>No articles available for {props.category}.</p>
+        <p>No articles available for {category}.</p>
       )}
     </div>
   );

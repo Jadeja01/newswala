@@ -40,3 +40,8 @@ a {
     color-scheme: dark;
   }
 }
+/* globals.css */
+.nav-link-blue {
+  color: blue !important; /* Make sure to use !important to override Bootstrap styles if needed */
+}
+

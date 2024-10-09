@@ -1,4 +1,4 @@
-import Bus_news from "@/comp_code/news_sec/business.js";
+import Bus_news from "@/comp_code/[category]/business.js";
 import "bootstrap/dist/css/bootstrap.css";
 
 export default function Business() {
