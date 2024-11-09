@@ -7,8 +7,8 @@ export default function Main_Navbar() {
   const pathname = usePathname(); // Get the current pathname
 
   return (
-    <nav className="mb-5 navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container-fluid">
+    <nav className="d-flex justify-content-around p-2 mb-5 navbar navbar-expand-lg navbar-light bg-light">
+      <div style={{flexBasis : "80%"}} className="container-fluid">
         <button
           className="navbar-toggler"
           type="button"
@@ -74,6 +74,10 @@ export default function Main_Navbar() {
           </ul>
         </div>
       </div>
+      <div style={{flexBasis : "20%"}} className=".d-flex ">
+    <Link href="/signup" type="button" className="me-1 btn btn-primary">Signup</Link>
+    <Link href="/login" type="button" className="btn btn-primary m2">Login</Link>
+    </div>
     </nav>
   );
 }

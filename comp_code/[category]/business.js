@@ -34,6 +34,7 @@ export default function Bus_news({ category }) {
   // Function to handle next button click
   const handleNext = () => {
     if (currentPage * pageSize < totalResults) {
+      setLoading(true)
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
@@ -41,6 +42,7 @@ export default function Bus_news({ category }) {
   // Function to handle previous button click
   const handlePrevious = () => {
     if (currentPage > 1) {
+      setLoading(true)
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
