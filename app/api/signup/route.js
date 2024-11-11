@@ -1,14 +1,6 @@
-// app/api/signup/route.js
+import "../../../db/connect.js"
 
-import mongoose from "mongoose";
 import User from "@/backend/userSchema/page";
-
-if (!mongoose.connection.readyState) {
-  mongoose.connect("mongodb+srv://forwork2004dev:_V!M!vTM3hiY8sU@clusterfornextjs.1xf1c.mongodb.net/", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }).catch((error) => console.error("Database connection error:", error));
-}
 
 export async function POST(req) {
   try {

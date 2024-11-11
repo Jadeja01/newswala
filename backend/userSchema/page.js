@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-mongoose.connect("mongodb+srv://forwork2004dev:_V!M!vTM3hiY8sU@clusterfornextjs.1xf1c.mongodb.net/")
 
 
 const userSchema = new mongoose.Schema({
