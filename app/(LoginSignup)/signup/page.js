@@ -36,7 +36,7 @@ export default function Signup() {
 
   return (
     <div className="p-5">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
@@ -74,7 +74,7 @@ export default function Signup() {
             required
           />
         </div>
-        <button onClick={handleSubmit} type="submit" className="mt-2 btn btn-primary">
+        <button type="submit" className="mt-2 btn btn-primary">
           Submit
         </button>
       </form>

@@ -12,9 +12,11 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    default: "user" + new Date().getMilliseconds(),
+    required: true
   },
+  verifyToken : String,
+  verifyTokenExpiration : Date,
+
 });
 
 // Check if the model is already compiled and, if not, define it.

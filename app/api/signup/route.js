@@ -1,28 +1,35 @@
-import "../../../db/connect.js"
+// app/api/signup/route.js
+import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "@/backend/userSchema/page.js";
+import "../../../db/connect.js";
 
-import User from "@/backend/userSchema/page";
+// Use environment variable for JWT secret
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
 export async function POST(req) {
   try {
     const { username, email, password } = await req.json();
-    
-    const newUser = new User({
-      name : username,
-      email : email,
-      password : password
-    });
 
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ error: "User already exists" }, { status: 409 });
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
-    return new Response(JSON.stringify({ message: "User created successfully!" }), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    // Generate JWT token for the new user
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
+    console.log("Token when signing: ", token);
+
+    return NextResponse.json({ message: "Signup successful", token }, { status: 201 });
   } catch (error) {
-    console.error("Server error:", error); // Log detailed error for debugging
-    return new Response(JSON.stringify({ error: "Server error, please try again later." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error("Error in signup route:", error); // Logs any server error
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
