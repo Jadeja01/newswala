@@ -4,23 +4,35 @@ import axios from "axios";
 
 export default function Bus_news({ category }) {
   const Category = category == undefined ? "general" : category;
-  console.log("Category:", Category);
-
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1); // Track the current page
-  const [totalResults, setTotalResults] = useState(0); // Track total results from API
-  const pageSize = 10; // Number of articles per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [count,setCount] = useState(0);
+  const pageSize = 10;
 
   useEffect(() => {
     const fetchNews = async () => {
       const apiKey = "71394d9ac17f4df486a392bced45d97f";
       const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${Category}&pageSize=${pageSize}&page=${currentPage}&apiKey=${apiKey}`;
+      console.log("Url=",apiUrl)
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        console.error("No token found");
+        // Redirect to login if no token
+        window.location.href = "/user";
+        return;
+      }
+
       try {
-        const response = await axios.get(apiUrl);
-        console.log("Data=", response.data);
+        const response = await axios.get(apiUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setArticles(response.data.articles);
-        setTotalResults(response.data.totalResults); // Save total results from the API
+        console.log('Articles:',articles);
+        
+        setTotalResults(response.data.totalResults);
         setLoading(false);
       } catch (error) {
         console.error("Error while fetching news:", error);
@@ -31,18 +43,17 @@ export default function Bus_news({ category }) {
     fetchNews();
   }, [Category, currentPage]);
 
-  // Function to handle next button click
+  // Handle pagination
   const handleNext = () => {
     if (currentPage * pageSize < totalResults) {
-      setLoading(true)
+      setLoading(true);
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
-  // Function to handle previous button click
   const handlePrevious = () => {
     if (currentPage > 1) {
-      setLoading(true)
+      setLoading(true);
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
@@ -54,11 +65,10 @@ export default function Bus_news({ category }) {
       ) : articles.length > 0 ? (
         <div>
           <div className="row">
-            {articles.map((e) => (
-              <div className="col-md-4 mb-4" key={e.url}>
+            {articles.map((e,index) => (
+              <div className="col-md-4 mb-4" key={`${e.url}-${index}`}>
                 <div className="card h-100">
                   {e.urlToImage && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={e.urlToImage}
                       className="card-img-top"

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Bus_news from "@/comp_code/[category]/business.js";
 
 export default function Navbar() {

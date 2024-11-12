@@ -24,7 +24,9 @@ export default function Signup() {
       });
 
       if (response.ok) {
-        alert("User created successfully!");
+        const data = await response.json();
+        localStorage.setItem("authToken", data.token);
+        window.location.href = "/"
       } else {
         alert("Error creating user.");
       }

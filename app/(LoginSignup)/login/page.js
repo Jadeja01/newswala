@@ -20,9 +20,9 @@ export default function Login() {
       if (!response.ok) {
         throw new Error("Invalid email or password");
       }
-
       const data = await response.json();
-      alert("Login successful!");
+      localStorage.setItem("authToken", data.token);
+      window.location.href ="/"
     } catch (error) {
       alert(error.message);
     }

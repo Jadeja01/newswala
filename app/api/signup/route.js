@@ -26,7 +26,6 @@ export async function POST(req) {
     // Generate JWT token for the new user
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
     console.log("Token when signing: ", token);
-
     return NextResponse.json({ message: "Signup successful", token }, { status: 201 });
   } catch (error) {
     console.error("Error in signup route:", error); // Logs any server error

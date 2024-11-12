@@ -26,7 +26,6 @@ export async function POST(req) {
     // Generate a JWT token if credentials are valid
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
     console.log("Token when logging in: ", token);
-
     // Return the token and a success message
     return NextResponse.json({ message: "Login successful", token }, { status: 200 });
   } catch (error) {
