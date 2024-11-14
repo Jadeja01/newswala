@@ -13,7 +13,8 @@ export default function Signup() {
       username,
       email,
       password,
-    }
+    };
+
     try {
       const response = await fetch("/api/signup", {
         method: "POST",
@@ -24,9 +25,8 @@ export default function Signup() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("authToken", data.token);
-        window.location.href = "/"
+        // Redirect or show success message after signup
+        window.location.href = "/";
       } else {
         alert("Error creating user.");
       }

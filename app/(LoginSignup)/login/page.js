@@ -1,12 +1,16 @@
 "use client";
+import Cookies from "js-cookie";
+import { useState } from "react";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   async function handleSubmit(event) {
     event.preventDefault(); // Prevents the default form submission behavior
-
-    // Get the email and password values from the form
-    const email = event.target.email.value;
-    const password = event.target.password.value;
+    const reqBody = {
+      email,
+      password
+    }
 
     try {
       const response = await fetch("/api/login", {
@@ -14,14 +18,17 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(reqBody),
       });
+console.log('Response',response);
 
       if (!response.ok) {
         throw new Error("Invalid email or password");
       }
+console.log('Response.cookies=',response.cookies);
+
       const data = await response.json();
-      localStorage.setItem("authToken", data.token);
+      console.log("Data of login page::",data);
       window.location.href ="/"
     } catch (error) {
       alert(error.message);
@@ -37,6 +44,7 @@ export default function Login() {
             required
             type="email"
             name="email"
+            onChange={(e) => setEmail(e.target.value)}
             className="form-control"
             id="exampleInputEmail1"
             aria-describedby="emailHelp"
@@ -49,6 +57,7 @@ export default function Login() {
             required
             type="password"
             name="password"
+            onChange={(e) => setPassword(e.target.value)}
             className="form-control"
             id="exampleInputPassword1"
             placeholder="Password"

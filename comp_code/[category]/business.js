@@ -1,85 +1,86 @@
+// app/components/Bus_comp.js
 "use client";
+
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useToken } from "@/app/TokenContext/TokenContext";
 
 export default function Bus_news({ category }) {
-  const Category = category == undefined ? "general" : category;
+  console.log("useToken context::", useToken);
+  const { token } = useToken(); // Access token from context
+  console.log("Token from context", token);
+
+  const Category = category || "general";
+  const [confirmToken, setConfirmToken] = useState(token);
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [count,setCount] = useState(0);
   const pageSize = 10;
 
-  useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = "71394d9ac17f4df486a392bced45d97f";
-      const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${Category}&pageSize=${pageSize}&page=${currentPage}&apiKey=${apiKey}`;
-      console.log("Url=",apiUrl)
-      const token = localStorage.getItem("authToken");
+      console.log("Token inside fetchnews", confirmToken);
 
-      if (!token) {
-        console.error("No token found");
-        // Redirect to login if no token
+      if (!confirmToken) {
+        console.log("No token found, skipping fetch.");
+        setConfirmToken(null);
         window.location.href = "/user";
-        return;
+        return; // Only fetch news if token exists
       }
 
       try {
+        const apiKey = "71394d9ac17f4df486a392bced45d97f";
+        const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${Category}&pageSize=${pageSize}&page=${currentPage}&apiKey=${apiKey}`;
+        console.log("Fetching news from URL:", apiUrl);
+
         const response = await axios.get(apiUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setArticles(response.data.articles);
-        console.log('Articles:',articles);
-        
-        setTotalResults(response.data.totalResults);
+
+        if (response.data && response.data.articles) {
+          setArticles(response.data.articles);
+          setTotalResults(response.data.totalResults);
+          console.log("Fetched articles:", response.data.articles);
+        } else {
+          console.warn("No articles found in response.");
+          setArticles([]);
+        }
+
         setLoading(false);
       } catch (error) {
-        console.error("Error while fetching news:", error);
+        console.error("Error fetching news (Bus_comp):", error);
+        alert("Error fetching news. Please try again.");
         setArticles([]);
-        setLoading(true);
+        setLoading(false); // Set to false on error to prevent indefinite loading
       }
     };
-    fetchNews();
-  }, [Category, currentPage]);
 
-  // Handle pagination
-  const handleNext = () => {
-    if (currentPage * pageSize < totalResults) {
-      setLoading(true);
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setLoading(true);
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
+    useState(()=>{
+      fetchNews();
+    },[Category, currentPage]);
 
   return (
     <div className="container">
       {loading ? (
         <p>Loading news...</p>
-      ) : articles.length > 0 ? (
+      ) : (
         <div>
           <div className="row">
-            {articles.map((e,index) => (
-              <div className="col-md-4 mb-4" key={`${e.url}-${index}`}>
+            {articles.map((article, index) => (
+              <div className="col-md-4 mb-4" key={`${article.url}-${index}`}>
                 <div className="card h-100">
-                  {e.urlToImage && (
+                  {article.urlToImage && (
                     <img
-                      src={e.urlToImage}
+                      src={article.urlToImage}
                       className="card-img-top"
-                      alt={e.title}
+                      alt={article.title}
                     />
                   )}
                   <div className="card-body">
-                    <h5 className="card-title">{e.title}</h5>
-                    <p className="card-text">{e.description}</p>
+                    <h5 className="card-title">{article.title}</h5>
+                    <p className="card-text">{article.description}</p>
                     <a
-                      href={e.url}
+                      href={article.url}
                       className="btn btn-primary"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -91,27 +92,23 @@ export default function Bus_news({ category }) {
               </div>
             ))}
           </div>
-
-          {/* Pagination Controls */}
           <div className="d-flex justify-content-between my-4">
             <button
               className="btn btn-secondary"
-              onClick={handlePrevious}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
             >
               Previous
             </button>
             <button
               className="btn btn-secondary"
-              onClick={handleNext}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
               disabled={currentPage * pageSize >= totalResults}
             >
               Next
             </button>
           </div>
         </div>
-      ) : (
-        <p>No articles available for {category}.</p>
       )}
     </div>
   );

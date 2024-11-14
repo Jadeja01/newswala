@@ -5,10 +5,9 @@ import bcrypt from "bcrypt";
 import User from "@/backend/userSchema/page.js";
 import "../../../db/connect.js";
 
-// Use environment variable for JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-export async function POST(req) {
+export async function POST(req, res) {
   try {
     const { username, email, password } = await req.json();
 
@@ -26,9 +25,19 @@ export async function POST(req) {
     // Generate JWT token for the new user
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
     console.log("Token when signing: ", token);
-    return NextResponse.json({ message: "Signup successful", token }, { status: 201 });
+
+    // Set the token in an HTTP-only cookie
+    const response = NextResponse.json({ message: "Signup successful" });
+    response.cookies.set("authToken", token, {
+      httpOnly: true, // Makes the cookie inaccessible to JavaScript on the client side
+      secure: process.env.NODE_ENV === "production", // Ensures the cookie is only sent over HTTPS in production
+      maxAge: 3600, // 1 hour expiration (in seconds)
+      path: "/", // Available across the entire application
+    });
+
+    return response;
   } catch (error) {
-    console.error("Error in signup route:", error); // Logs any server error
+    console.error("Error in signup route:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -1,24 +1,29 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import "../../globals.css";
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { useToken } from "@/app/TokenContext/TokenContext";
+import { useRouter } from "next/navigation";
 
 export default function Main_Navbar() {
-  const [token, setToken] = useState(false); // Default to `false`
-  const pathname = usePathname(); 
+  const {token, setToken} = useToken(); // Track if the user is logged in or not
+  const pathname = usePathname();
+  const router = useRouter();
 
-  useEffect(() => {
-    // Check localStorage on the client side
-    const storedToken = localStorage.getItem("authToken") ? true : false;
-    setToken(storedToken);
-  }, []);
-
-  function handleLogout() {
-    localStorage.removeItem("authToken");
-    setToken(false); // Update the state to reflect logout
-    window.location.href = "/user";
-  }
+  const handleLogout = async () => {
+    try {
+      await axios.get("/api/cleartoken"); // Call the API route to clear the cookie
+      Cookies.remove("authToken"); // Clear any client-side storage if applicable
+      setToken(null); // Update context
+      router.push("/user"); // Redirect after logout
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <nav className="d-flex justify-content-around p-2 mb-5 navbar navbar-expand-lg navbar-light bg-light">
@@ -42,9 +47,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/"
-                className={`nav-link ${
-                  pathname === "/" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/" ? "underline nav-link-blue" : ""}`}
                 aria-current="page"
               >
                 Home
@@ -53,9 +56,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/business"
-                className={`nav-link ${
-                  pathname === "/business" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/business" ? "underline nav-link-blue" : ""}`}
               >
                 Business
               </Link>
@@ -63,9 +64,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/sports"
-                className={`nav-link ${
-                  pathname === "/sports" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/sports" ? "underline nav-link-blue" : ""}`}
               >
                 Sports
               </Link>
@@ -73,9 +72,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/entertainment"
-                className={`nav-link ${
-                  pathname === "/entertainment" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/entertainment" ? "underline nav-link-blue" : ""}`}
               >
                 Entertainment
               </Link>
@@ -83,9 +80,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/health"
-                className={`nav-link ${
-                  pathname === "/health" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/health" ? "underline nav-link-blue" : ""}`}
               >
                 Health
               </Link>
@@ -93,9 +88,7 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/science"
-                className={`nav-link ${
-                  pathname === "/science" ? "underline nav-link-blue" : ""
-                }`}
+                className={`nav-link ${pathname === "/science" ? "underline nav-link-blue" : ""}`}
               >
                 Science
               </Link>
@@ -110,10 +103,10 @@ export default function Main_Navbar() {
           </button>
         ) : (
           <div>
-            <Link href="/signup" type="button" className="me-1 btn btn-primary">
+            <Link href="/signup" className="me-1 btn btn-primary">
               Signup
             </Link>
-            <Link href="/login" type="button" className="btn btn-primary m-2">
+            <Link href="/login" className="btn btn-primary m-2">
               Login
             </Link>
           </div>
