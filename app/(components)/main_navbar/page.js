@@ -10,9 +10,30 @@ import { useToken } from "@/app/TokenContext/TokenContext";
 import { useRouter } from "next/navigation";
 
 export default function Main_Navbar() {
-  const {token, setToken} = useToken(); // Track if the user is logged in or not
+  const { token, setToken } = useToken(); // Track if the user is logged in or not
   const pathname = usePathname();
   const router = useRouter();
+  const [profileVisible, setProfileVisible] = useState(false); // Track profile dropdown visibility
+  const [userDetails, setUserDetails] = useState(null); // Store user details
+
+  // Fetch user details when token is available
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!token) return;
+
+      try {
+        console.log('TOKEN=',token);
+        const response = await axios.get("/api/getUserDetails", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserDetails(response.data); // Update user details state
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, [token]);
 
   const handleLogout = async () => {
     try {
@@ -47,7 +68,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/"
-                className={`nav-link ${pathname === "/" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/" ? "underline nav-link-blue" : ""
+                }`}
                 aria-current="page"
               >
                 Home
@@ -56,7 +79,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/business"
-                className={`nav-link ${pathname === "/business" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/business" ? "underline nav-link-blue" : ""
+                }`}
               >
                 Business
               </Link>
@@ -64,7 +89,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/sports"
-                className={`nav-link ${pathname === "/sports" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/sports" ? "underline nav-link-blue" : ""
+                }`}
               >
                 Sports
               </Link>
@@ -72,7 +99,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/entertainment"
-                className={`nav-link ${pathname === "/entertainment" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/entertainment" ? "underline nav-link-blue" : ""
+                }`}
               >
                 Entertainment
               </Link>
@@ -80,7 +109,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/health"
-                className={`nav-link ${pathname === "/health" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/health" ? "underline nav-link-blue" : ""
+                }`}
               >
                 Health
               </Link>
@@ -88,7 +119,9 @@ export default function Main_Navbar() {
             <li className="nav-item">
               <Link
                 href="/science"
-                className={`nav-link ${pathname === "/science" ? "underline nav-link-blue" : ""}`}
+                className={`nav-link ${
+                  pathname === "/science" ? "underline nav-link-blue" : ""
+                }`}
               >
                 Science
               </Link>
@@ -96,22 +129,67 @@ export default function Main_Navbar() {
           </ul>
         </div>
       </div>
-      <div style={{ flexBasis: "20%" }} className="d-flex">
-        {token ? (
-          <button onClick={handleLogout} type="button" className="me-1 btn btn-primary">
-            Logout
-          </button>
-        ) : (
-          <div>
-            <Link href="/signup" className="me-1 btn btn-primary">
-              Signup
-            </Link>
-            <Link href="/login" className="btn btn-primary m-2">
-              Login
-            </Link>
+      {token ? (
+        <div className="d-flex justify-content-around align-item-center">
+          <div
+            style={{
+              backgroundColor: "black",
+              color: "white",
+              padding: 3,
+              width: "40px",
+              height: "40px",
+              display: "grid",
+              placeItems: "center",
+              borderRadius: "50%",
+              fontSize: "20px",
+              cursor: "pointer",
+            }}
+            onClick={() => setProfileVisible((prev) => !prev)} // Toggle profile visibility
+          >
+            {userDetails?.username[0]?.toUpperCase() || "U"}
           </div>
-        )}
-      </div>
+          {profileVisible && (
+            <div
+              style={{
+                position: "absolute",
+                top: "60px",
+                right: "20px",
+                backgroundColor: "white",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                padding: "10px",
+                borderRadius: "5px",
+                zIndex: 1000,
+              }}
+            >
+              <p style={{ margin: 0 }}>
+                <strong>Username:</strong> {userDetails?.username}
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Email:</strong> {userDetails?.email}
+              </p>
+              <button
+                onClick={handleLogout}
+                className="btn btn-danger mt-2"
+                style={{ width: "100%" }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          style={{ flexBasis: "20%" }}
+          className="d-flex justify-content-around align-item-center"
+        >
+          <Link href="/signup" className="btn btn-primary">
+            Signup
+          </Link>
+          <Link href="/login" className="btn btn-primary">
+            Login
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }
