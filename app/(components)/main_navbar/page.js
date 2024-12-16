@@ -146,7 +146,7 @@ export default function Main_Navbar() {
             }}
             onClick={() => setProfileVisible((prev) => !prev)} // Toggle profile visibility
           >
-            {userDetails?.username[0]?.toUpperCase() || "U"}
+            {userDetails?.username[0]?.toUpperCase() || "NA"}
           </div>
           {profileVisible && (
             <div

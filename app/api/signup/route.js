@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import User from "@/backend/userSchema/page.js";
 import "../../../db/connect.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req, res) {
   try {

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "@/backend/userSchema/page";
 
-const JWT_SECRET = "your_jwt_secret"; // Replace with your actual secret key
+const JWT_SECRET = process.env.JWT_SECRET; // Replace with your actual secret key
 
 export async function GET(req) {
   try {
