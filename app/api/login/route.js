@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import User from "@/backend/userSchema/page.js";
 import "../../../db/connect.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req) {
   try {
@@ -13,11 +12,11 @@ export async function POST(req) {
     // Find user and validate password
     const user = await User.findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid email or password(inside login route)" }, { status: 401 });
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
     
 
     // Set the token in an HTTP-only cookie
