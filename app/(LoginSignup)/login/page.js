@@ -19,9 +19,9 @@ export default function Login() {
         },
         body: JSON.stringify(reqBody),
       });
-console.log('Response',response);
+console.log('Response=',response);
 
-      if (!response.ok) {
+      if (response.ok) {
         throw new Error("Invalid email or password!!!");
       }
 console.log('Response.cookies=',response.cookies);
