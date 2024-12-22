@@ -2,14 +2,17 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "@/backend/userSchema/page.js";
+import User from "@/backend/userSchema/user.js"; // Rename file for clarity
 import "../../../db/connect.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const { username, email, password } = await req.json();
+
+    // Validate environment variable
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in the environment variables");
+    }
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
@@ -23,8 +26,7 @@ export async function POST(req, res) {
     await newUser.save();
 
     // Generate JWT token for the new user
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
-    console.log("Token when signing: ", token);
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     // Set the token in an HTTP-only cookie
     const response = NextResponse.json({ message: "Signup successful" });
@@ -37,7 +39,7 @@ export async function POST(req, res) {
 
     return response;
   } catch (error) {
-    console.error("Error in signup route:", error);
+    console.error("Error in signup route:", error.message || error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
