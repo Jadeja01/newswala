@@ -4,33 +4,34 @@ import { useState } from "react";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   async function handleSubmit(event) {
-    event.preventDefault(); // Prevents the default form submission behavior
-    const reqBody = {
-      email,
-      password
-    }
+    event.preventDefault();
+    setIsLoading(true);
+
+    const reqBody = { email, password };
 
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reqBody),
+        credentials: "include",
       });
-console.log('Response=',response);
 
-      if (response.ok) {
+      if (!response.ok) {
         throw new Error("Invalid email or password!!!");
       }
-console.log('Response.cookies=',response.cookies);
 
       const data = await response.json();
-      console.log("Data of login page::",data);
-      window.location.href ="/"
+      console.log("Data of login page::", data);
+      window.location.href = "/";
     } catch (error) {
-      alert(error.message);
+      console.error("Error during login:", error);
+      alert(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -62,8 +63,8 @@ console.log('Response.cookies=',response.cookies);
             placeholder="Password"
           />
         </div>
-        <button type="submit" className="mt-2 btn btn-primary">
-          Submit
+        <button type="submit" className="mt-2 btn btn-primary" disabled={isLoading}>
+          {isLoading ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>

@@ -6,9 +6,12 @@ export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
+    setIsLoading(true); // Start loading state
+
     const reqBody = {
       username,
       email,
@@ -24,23 +27,28 @@ export default function Signup() {
         body: JSON.stringify(reqBody),
       });
 
-      if (response.ok) {
-        // Redirect or show success message after signup
-        window.location.href = "/";
-      } else {
-        alert("Error creating user.");
+      if (!response.ok) {
+        // Extract error message from the response, if available
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error creating user.");
       }
+
+      // Success: Redirect to homepage or another page
+      window.location.href = "/";
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred.");
+      alert(error.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoading(false); // Stop loading state
     }
   }
 
   return (
     <div className="p-5">
+      <h2>Sign Up</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="exampleInputUsername">Username</label>
           <input
             type="text"
             className="form-control"
@@ -52,7 +60,7 @@ export default function Signup() {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="exampleInputEmail1">Email address</label>
           <input
             type="email"
             className="form-control"
@@ -65,7 +73,7 @@ export default function Signup() {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="exampleInputPassword1">Password</label>
           <input
             type="password"
             className="form-control"
@@ -76,8 +84,12 @@ export default function Signup() {
             required
           />
         </div>
-        <button type="submit" className="mt-2 btn btn-primary">
-          Submit
+        <button
+          type="submit"
+          className="mt-2 btn btn-primary"
+          disabled={isLoading}
+        >
+          {isLoading ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>
