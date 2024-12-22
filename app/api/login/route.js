@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "@/backend/userSchema/user.js"; // Update file name if necessary
+import User from "@/backend/userSchema/page.js";
 import "../../../db/connect.js";
 
 export async function POST(req) {
