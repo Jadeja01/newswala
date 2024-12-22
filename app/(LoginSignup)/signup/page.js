@@ -26,7 +26,9 @@ export default function Signup() {
         },
         body: JSON.stringify(reqBody),
       });
-
+      console.log("response=",response);
+      const data = await response.json();
+      console.log("data=",data);
       if (!response.ok) {
         // Extract error message from the response, if available
         const errorData = await response.json();

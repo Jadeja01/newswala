@@ -20,12 +20,12 @@ export default function Login() {
         credentials: "include",
       });
 
+      console.log("response=",response);
+      const data = await response.json();
+      console.log("data=",data);
       if (!response.ok) {
         throw new Error("Invalid email or password!!!");
       }
-
-      const data = await response.json();
-      console.log("Data of login page::", data);
       window.location.href = "/";
     } catch (error) {
       console.error("Error during login:", error);
