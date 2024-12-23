@@ -5,14 +5,12 @@ import bcrypt from "bcrypt";
 import User from "@/backend/userSchema/page.js";
 import "../../../db/connect.js";
 
-export async function POST(req) {
+const JWT_SECRET = process.env.JWT_SECRET;
+
+
+export async function POST(req, res) {
   try {
     const { username, email, password } = await req.json();
-
-    // Validate environment variable
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not defined in the environment variables");
-    }
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
@@ -26,7 +24,8 @@ export async function POST(req) {
     await newUser.save();
 
     // Generate JWT token for the new user
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1h" });
+    console.log("Token when signing: ", token);
 
     // Set the token in an HTTP-only cookie
     const response = NextResponse.json({ message: "Signup successful" });
@@ -39,7 +38,7 @@ export async function POST(req) {
 
     return response;
   } catch (error) {
-    console.error("Error in signup route:", error.message || error);
+    console.error("Error in signup route:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
